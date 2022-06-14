@@ -1,16 +1,17 @@
 package Tree;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Node {
-    private String fileName;
-    private ArrayList<Node> directories;
-    private ArrayList<String> files;
+    private String directoryName;
+    private HashMap<String,Node> directories;
+    private HashMap<String,File> files;
 
     public Node(String pName){
-        this.fileName = pName;
-        this.directories = new ArrayList<>();
-        this.files = new ArrayList<>();
+        this.directoryName = pName;
+        this.directories = new HashMap<>();
+        this.files = new HashMap<>();
     }
 
     public boolean isEmpty(){
@@ -18,67 +19,85 @@ public class Node {
     }
 
     public void addDirectory(Node directory){
-        if(!directories.contains(directory) && this != directory){
-            directories.add(directory);
+        if(!directories.containsKey(directory.getDirectoryName()) && this != directory){
+            directories.put(directory.getDirectoryName(),directory);
         }
     }
 
     public void deleteDirectory(Node directory){
-        for (Node d:directories) {
-            if(d == directory){
-                if(d.isEmpty()){
-                    directories.remove(d);
-                }else{
-                    d.deleteAll();
-                }
+        Node d = directories.get(directory.getDirectoryName());
+        if(d == directory){
+            if(d.isEmpty())
+                this.directories.remove(directory.getDirectoryName());
+            else{
+                d.deleteAll();
+                this.directories.remove(directory.getDirectoryName());
             }
         }
     }
 
-    public void addFile(String file){
-        if(!files.contains(file)){
-            files.add(file);
+    public void addFile(File file){
+        if(!files.containsKey(file.getFileName())){
+            files.put(file.getFileName(),file);
         }
     }
 
-    public void deleteFile(String file){
-        files.remove(file);
+    public void deleteFile(File file){
+        files.remove(file.getFileName());
     }
 
     private void deleteAll(){
-        Node directory;
-        while(!directories.isEmpty()){
-            directory = directories.get(0);
-            if(directory.isEmpty()){
-                directories.remove(0);
-            }else{
-                directory.deleteAll();
-                directories.remove(0);
-            }
+        for(Map.Entry directoryEntry: directories.entrySet()){
+            String dName = (String)directoryEntry.getKey();
+            Node directory = (Node) directoryEntry.getValue();
+            directory.deleteAll();
+            directories.remove(dName);
         }
         files.clear();
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getDirectoryName() {
+        return directoryName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public boolean renameFile(String fileName, String newName){
+        File file = files.get(fileName);
+        if(file != null){
+            files.remove(fileName);
+            file.setFileName(newName);
+            addFile(file);
+            return true;
+        }
+        return false;
     }
 
-    public ArrayList<Node> getDirectories() {
+    public boolean renameDirectory(String directoryName, String newName){
+        Node directory = directories.get(directoryName);
+        if(directory != null){
+            files.remove(directoryName);
+            directory.setDirectoryName(newName);
+            addDirectory(directory);
+            return true;
+        }
+        return false;
+    }
+
+    public void setDirectoryName(String directoryName) {
+        this.directoryName = directoryName;
+    }
+
+    public HashMap<String,Node> getDirectories() {
         return directories;
     }
 
-    public ArrayList<String> getFiles() {
+    public HashMap<String,File> getFiles() {
         return files;
     }
 
     @Override
     public String toString() {
         return "Node{" +
-                "fileName='" + fileName + '\'' +
+                "directoryName='" + directoryName + '\'' +
                 ", directories=" + directories +
                 ", files=" + files +
                 '}';
