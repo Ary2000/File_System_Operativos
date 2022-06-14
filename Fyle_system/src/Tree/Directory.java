@@ -1,14 +1,23 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package Tree;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Node {
+/**
+ *
+ * @author irsac
+ */
+public class Directory {
     private String directoryName;
-    private HashMap<String,Node> directories;
+    private HashMap<String,Directory> directories;
     private HashMap<String,File> files;
 
-    public Node(String pName){
+    public Directory(String pName){
         this.directoryName = pName;
         this.directories = new HashMap<>();
         this.files = new HashMap<>();
@@ -18,14 +27,14 @@ public class Node {
         return directories.isEmpty() && files.isEmpty();
     }
 
-    public void addDirectory(Node directory){
+    public void addDirectory(Directory directory){
         if(!directories.containsKey(directory.getDirectoryName()) && this != directory){
             directories.put(directory.getDirectoryName(),directory);
         }
     }
 
-    public void deleteDirectory(Node directory){
-        Node d = directories.get(directory.getDirectoryName());
+    public void deleteDirectory(Directory directory){
+        Directory d = directories.get(directory.getDirectoryName());
         if(d == directory){
             if(d.isEmpty())
                 this.directories.remove(directory.getDirectoryName());
@@ -49,7 +58,7 @@ public class Node {
     private void deleteAll(){
         for(Map.Entry directoryEntry: directories.entrySet()){
             String dName = (String)directoryEntry.getKey();
-            Node directory = (Node) directoryEntry.getValue();
+            Directory directory = (Directory) directoryEntry.getValue();
             directory.deleteAll();
             directories.remove(dName);//corregir?
         }
@@ -72,7 +81,7 @@ public class Node {
     }
 
     public boolean renameDirectory(String directoryName, String newName){
-        Node directory = directories.get(directoryName);
+        Directory directory = directories.get(directoryName);
         if(directory != null){
             files.remove(directoryName);
             directory.setDirectoryName(newName);
@@ -86,7 +95,7 @@ public class Node {
         this.directoryName = directoryName;
     }
 
-    public HashMap<String,Node> getDirectories() {
+    public HashMap<String,Directory> getDirectories() {
         return directories;
     }
 
