@@ -6,6 +6,7 @@
 package Tree;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -13,12 +14,19 @@ import java.util.ArrayList;
  */
 public class File {
     private String fileName;
-    private String extencion;
+    private String extension;
     private String content;
+    private Date creationDate;
+    private Date modificationDate;
+    private int size;
     private ArrayList<Integer> registrosBase;
 
-    public File(String name){
+    public File(String name, String extension, String content, int size){
         this.fileName = name;
+        this.extension = extension;
+        this.content = content;
+        this.creationDate = new Date();
+        this.modificationDate = new Date();
         this.registrosBase = new ArrayList<>();
     }
 
@@ -44,5 +52,61 @@ public class File {
 
     public void setRegistrosBase(ArrayList<Integer> registrosBase) {
         this.registrosBase = registrosBase;
+    }
+
+    /**
+     * @return the extension
+     */
+    public String getExtension() {
+        return extension;
+    }
+
+    /**
+     * @param extension the extension to set
+     */
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    /**
+     * @return the creationDate
+     */
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    /**
+     * @param creationDate the creationDate to set
+     */
+    private void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    /**
+     * @return the modificationDate
+     */
+    public Date getModificationDate() {
+        return modificationDate;
+    }
+
+    /**
+     * @param modificationDate the modificationDate to set
+     */
+    public void setModificationDate() {
+        this.modificationDate = new Date();
+    }
+
+    /**
+     * @return the size
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * @param size the size to set
+     */
+    public void setSize(int size) {
+        this.size = size;
     }
 }

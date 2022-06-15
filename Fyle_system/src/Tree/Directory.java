@@ -74,8 +74,8 @@ public class Directory {
     }
 
     public void addFile(File file){
-        if(!fileExist(file.getFileName())){
-            files.put(file.getFileName(),file);
+        if(!fileExist(file.getFileName()+file.getExtension())){
+            files.put(file.getFileName()+file.getExtension(),file);
         }
     }
 
