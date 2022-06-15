@@ -51,14 +51,14 @@ public class Directory {
         }
     }
 
-    public void deleteDirectory(Directory directory){
-        Directory d = directories.get(directory.getDirectoryName());
-        if(d == directory){
+    public void deleteDirectory(String dName){
+        Directory d = directories.get(dName);
+        if(d != null){
             if(d.isEmpty())
-                this.directories.remove(directory.getDirectoryName());
+                this.directories.remove(dName);
             else{
                 d.deleteAll();
-                this.directories.remove(directory.getDirectoryName());
+                this.directories.remove(dName);
             }
         }
     }
