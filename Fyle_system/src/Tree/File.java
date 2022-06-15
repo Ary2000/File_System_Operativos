@@ -109,4 +109,14 @@ public class File {
     public void setSize(int size) {
         this.size = size;
     }
+    
+    public String toString(){
+        String str = "";
+        str += "File Name: " + this.fileName + "\n";
+        str += "Extension: " + this.extension + "\n";
+        str += "Creation Date: " + this.creationDate + "\n";
+        str += "Last modification Date: " + this.modificationDate + "\n";
+        str += "Size: " + String.valueOf(this.size) +"\n";
+        return str;
+    }
 }
