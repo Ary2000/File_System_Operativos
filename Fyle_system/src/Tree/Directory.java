@@ -5,6 +5,7 @@
  */
 package Tree;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 public class Directory {
     private String directoryName;
+    private Directory father;
     private HashMap<String,Directory> directories;
     private HashMap<String,File> files;
 
@@ -21,14 +23,30 @@ public class Directory {
         this.directoryName = pName;
         this.directories = new HashMap<>();
         this.files = new HashMap<>();
+        this.father = null;
+    }
+    
+    public Directory(String pName, Directory father){
+        this.directoryName = pName;
+        this.directories = new HashMap<>();
+        this.files = new HashMap<>();
+        this.father = father;
     }
 
     public boolean isEmpty(){
         return directories.isEmpty() && files.isEmpty();
     }
+    
+    public boolean directoryExist(String directoryName){
+        return directories.containsKey(directoryName);
+    }
+    
+    public boolean fileExist(String fileName){
+        return files.containsKey(fileName);
+    }
 
     public void addDirectory(Directory directory){
-        if(!directories.containsKey(directory.getDirectoryName()) && this != directory){
+        if(!directoryExist(directory.getDirectoryName()) && this != directory){
             directories.put(directory.getDirectoryName(),directory);
         }
     }
@@ -45,16 +63,6 @@ public class Directory {
         }
     }
 
-    public void addFile(File file){
-        if(!files.containsKey(file.getFileName())){
-            files.put(file.getFileName(),file);
-        }
-    }
-
-    public void deleteFile(File file){
-        files.remove(file.getFileName());
-    }
-
     private void deleteAll(){
         for(Map.Entry directoryEntry: directories.entrySet()){
             String dName = (String)directoryEntry.getKey();
@@ -65,13 +73,28 @@ public class Directory {
         files.clear();
     }
 
+    public void addFile(File file){
+        if(!fileExist(file.getFileName())){
+            files.put(file.getFileName(),file);
+        }
+    }
+
+    public ArrayList<Integer> deleteFile(String fileName){
+        if(fileExist(fileName)){
+            File file = files.get(fileName);
+            files.remove(fileName);
+            return file.getRegistrosBase();
+        }
+        return null;
+    }
+
     public String getDirectoryName() {
         return directoryName;
     }
-//verifivar que nmo el nombre nuevo
+
     public boolean renameFile(String fileName, String newName){
         File file = files.get(fileName);
-        if(file != null){
+        if(file != null && !fileExist(newName)){
             files.remove(fileName);
             file.setFileName(newName);
             addFile(file);
@@ -82,7 +105,7 @@ public class Directory {
 
     public boolean renameDirectory(String directoryName, String newName){
         Directory directory = directories.get(directoryName);
-        if(directory != null){
+        if(directory != null && !directoryExist(newName)){
             files.remove(directoryName);
             directory.setDirectoryName(newName);
             addDirectory(directory);
@@ -91,7 +114,7 @@ public class Directory {
         return false;
     }
 
-    public void setDirectoryName(String directoryName) {
+    private void setDirectoryName(String directoryName) {
         this.directoryName = directoryName;
     }
 
