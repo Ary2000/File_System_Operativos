@@ -33,15 +33,15 @@ public class ManejadorDD {
         Scanner sc = new Scanner(System.in);
         boolean inputCorrecto = false;
         while(!inputCorrecto) {
-        try {
-            System.out.print(mensaje);
-            int tamanoTxt = sc.nextInt();
-            return tamanoTxt;
-        }
-        catch(Exception e) {
-              System.out.print("");
-        }
-        System.out.println("Por favor usar un numero natural");
+            try {
+                System.out.print(mensaje);
+                int tamanoTxt = sc.nextInt();
+                return tamanoTxt;
+            }
+            catch(Exception e) {
+                  System.out.print("");
+            }
+            System.out.println("Por favor usar un numero natural");
         }
         return -1;
     }
@@ -71,10 +71,17 @@ public class ManejadorDD {
                     if(sectores[i] == 0){
                         sectores[i] = 1;
                         cantidadSectoresProceso--;
-                        byte[] data = {(byte)contenidoProceso.charAt(indiceContenidoProceso)};
-                        indiceContenidoProceso++;
-                        discoDuro.seek(i);
-                        discoDuro.write(data);
+                        //byte[] data = {(byte)contenidoProceso.charAt(indiceContenidoProceso)};
+                        String datosInsertar;
+                        if(indiceContenidoProceso+tamanoSectores < contenidoProceso.length()) {
+                            datosInsertar = contenidoProceso.substring(indiceContenidoProceso, indiceContenidoProceso+tamanoSectores);
+                        }
+                        else{
+                            datosInsertar = contenidoProceso.substring(indiceContenidoProceso);
+                        }
+                        indiceContenidoProceso += tamanoSectores;
+                        discoDuro.seek(i*tamanoSectores);
+                        discoDuro.write(datosInsertar.getBytes());
                         sectoresUsados.add(i);
                     }
                 }

@@ -18,6 +18,7 @@ import javax.swing.ScrollPaneConstants;
 
 import Tree.ManejadorDD;
 import java.util.List;
+import Tree.Arbol;
 
 
 /**
@@ -171,6 +172,8 @@ public class Consola extends javax.swing.JFrame {
 
     private static void mainAux(){
         ManejadorDD.crearDiscoDuro();
+        //Arbol arbol = new Arbol();
+        
         List<Integer> espaciosUsados = ManejadorDD.insertarEspacio("Nomb");
         ManejadorDD.insertarEspacio("as");
         ManejadorDD.eliminarEspacios(espaciosUsados);
