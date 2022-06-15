@@ -24,8 +24,10 @@ import java.io.RandomAccessFile;
 public class ManejadorDD {
     
     private static int[] sectores;
-    int cantidadSectores;
-    int tamanoSectores;
+    static int cantidadSectores;
+    static int tamanoSectores;
+    static RandomAccessFile discoDuro;
+    static int cantidadSectoresVacios;
     
     public static int inputInteger(String mensaje){
         Scanner sc = new Scanner(System.in);
@@ -44,54 +46,78 @@ public class ManejadorDD {
         return -1;
     }
     
-    public boolean revisarSiHayEspacio(int cantidadBytes) { return cantidadBytes/tamanoSectores == 0 ? false: true ; }
-    
-    public List<Integer> insertarEspacio(String contenidoProceso) {
+    public boolean revisarSiHayEspacio(String contenidoProceso) { 
         int cantidadBytes = contenidoProceso.length();
         List<Integer> sectoresUsados = new ArrayList();
         int cantidadSectoresProceso = cantidadBytes / tamanoSectores;
-        if(cantidadBytes % tamanoSectores == 0)
+        if(cantidadBytes % tamanoSectores != 0)
+            cantidadSectoresProceso++;
+        if(cantidadSectoresProceso <= cantidadSectoresVacios) {
+            return true;
+        }
+        return false;
+    }
+    
+    public static List<Integer> insertarEspacio(String contenidoProceso) {
+        int cantidadBytes = contenidoProceso.length();
+        List<Integer> sectoresUsados = new ArrayList();
+        int cantidadSectoresProceso = cantidadBytes / tamanoSectores;
+        if(cantidadBytes % tamanoSectores != 0)
             cantidadSectoresProceso++;
         if(cantidadSectoresProceso <= cantidadSectores) {
             try{
-                RandomAccessFile discoDuro = new RandomAccessFile("discoDuro.txt", "rw");
                 int indiceContenidoProceso = 0;
-                for(int i = 0; cantidadSectoresProceso < 0; i++) {
+                for(int i = 0; 0 < cantidadSectoresProceso; i++) {
                     if(sectores[i] == 0){
                         sectores[i] = 1;
                         cantidadSectoresProceso--;
-                        byte[] data = {(byte)contenidoProceso.charAt(i)};
-                        discoDuro.write(data, i, 1);
+                        byte[] data = {(byte)contenidoProceso.charAt(indiceContenidoProceso)};
+                        indiceContenidoProceso++;
+                        discoDuro.seek(i);
+                        discoDuro.write(data);
                         sectoresUsados.add(i);
                     }
                 }
-                discoDuro.close();
+                //discoDuro.close();
             } catch(Exception e) {
-                        
-                    }
+                System.out.println(e); 
+            }
         }
+        cantidadSectoresVacios -= cantidadSectoresProceso;
         return sectoresUsados;
     }
     
-    public void eliminarEspacios(List<Integer> sectoresUsados) {
+    public static void eliminarEspacios(List<Integer> sectoresUsados) {
+        byte[] espaciosLimpios = new byte[tamanoSectores];
+        Arrays.fill(espaciosLimpios, (byte)'0');
         sectoresUsados.forEach((sector) -> {
-            sector = 0;
+            try{
+            sectores[sector] = 0;
+            discoDuro.seek(sector);
+            discoDuro.write(espaciosLimpios);
+            } catch (Exception e) {
+            }
         });
+        cantidadSectoresVacios += sectoresUsados.size();
     }
     
-    public void crearDiscoDuro() {
+    public static void crearDiscoDuro() {
         cantidadSectores = inputInteger("Inserte el tamaño del disco: ");
         tamanoSectores = inputInteger("Inserte el tamaño de un sector: ");
         //String contenidoDisco = "0".repeat(cantidadSectores*tamanoSectores);
         char[] contenidoDisco = new char[cantidadSectores*tamanoSectores];
         Arrays.fill(contenidoDisco, '0');
         try {
-            File discoDuro = new File("discoDuro.txt");
-            FileWriter fw = new FileWriter(discoDuro.getAbsoluteFile());
+            File discoDuroAr = new File("discoDuro.txt");
+            FileWriter fw = new FileWriter(discoDuroAr.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(contenidoDisco);
             bw.close();
-            int[] sectores = IntStream.range(0, cantidadSectores).toArray();
+            discoDuro = new RandomAccessFile("discoDuro.txt", "rw");
+            sectores = new int[cantidadSectores];
+            cantidadSectoresVacios = cantidadSectores;
+            Arrays.fill(sectores, 0);
+            //sectores = IntStream.range(0, cantidadSectores).toArray();
             //sectores = Arrays.stream(arregloEspacios).boxed().collect( Collectors.toList() );
             System.out.println("Done");
 

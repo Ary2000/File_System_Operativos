@@ -16,6 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
+import Tree.ManejadorDD;
+import java.util.List;
+
+
 /**
  *
  * @author yeico
@@ -165,6 +169,14 @@ public class Consola extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private static void mainAux(){
+        ManejadorDD.crearDiscoDuro();
+        List<Integer> espaciosUsados = ManejadorDD.insertarEspacio("Nomb");
+        ManejadorDD.insertarEspacio("as");
+        ManejadorDD.eliminarEspacios(espaciosUsados);
+        ManejadorDD.insertarEspacio("jajaXD");
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -195,6 +207,7 @@ public class Consola extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                mainAux();
                 new Consola().setVisible(true);
             }
         });
