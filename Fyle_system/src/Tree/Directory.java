@@ -53,26 +53,40 @@ public class Directory {
         return false;
     }
 
-    public void deleteDirectory(String dName){
+    public ArrayList<Integer> deleteDirectory(String dName){
         Directory d = directories.get(dName);
+        ArrayList<Integer> temp = new ArrayList<>();
         if(d != null){
-            if(d.isEmpty())
+            if(d.isEmpty()){
                 this.directories.remove(dName);
+            }
             else{
-                d.deleteAll();
+                temp = d.deleteAll();
+                for(Map.Entry fileEntry: files.entrySet()){
+                    File file = (File) fileEntry.getValue();
+                    temp.addAll(file.getRegistrosBase());
+                }
                 this.directories.remove(dName);
             }
         }
+        files.clear();
+        return temp;
     }
 
-    private void deleteAll(){
+    private ArrayList<Integer> deleteAll(){
+        ArrayList<Integer> temp = new ArrayList<>();
         for(Map.Entry directoryEntry: directories.entrySet()){
             String dName = (String)directoryEntry.getKey();
             Directory directory = (Directory) directoryEntry.getValue();
-            directory.deleteAll();
+            temp.addAll(directory.deleteAll());
             directories.remove(dName);//corregir?
         }
+        for(Map.Entry fileEntry: files.entrySet()){
+            File file = (File) fileEntry.getValue();
+            temp.addAll(file.getRegistrosBase());
+        }
         files.clear();
+        return temp;
     }
 
     public boolean addFile(File file){
