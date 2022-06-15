@@ -45,20 +45,22 @@ public class Directory {
         return files.containsKey(fileName);
     }
 
-    public void addDirectory(Directory directory){
+    public boolean addDirectory(Directory directory){
         if(!directoryExist(directory.getDirectoryName()) && this != directory){
             directories.put(directory.getDirectoryName(),directory);
+            return true;
         }
+        return false;
     }
 
-    public void deleteDirectory(Directory directory){
-        Directory d = directories.get(directory.getDirectoryName());
-        if(d == directory){
+    public void deleteDirectory(String dName){
+        Directory d = directories.get(dName);
+        if(d != null){
             if(d.isEmpty())
-                this.directories.remove(directory.getDirectoryName());
+                this.directories.remove(dName);
             else{
                 d.deleteAll();
-                this.directories.remove(directory.getDirectoryName());
+                this.directories.remove(dName);
             }
         }
     }
@@ -73,10 +75,12 @@ public class Directory {
         files.clear();
     }
 
-    public void addFile(File file){
-        if(!fileExist(file.getFileName())){
-            files.put(file.getFileName(),file);
+    public boolean addFile(File file){
+        if(!fileExist(file.getFileName()+file.getExtension())){
+            files.put(file.getFileName()+file.getExtension(),file);
+            return true;
         }
+        return false;
     }
 
     public ArrayList<Integer> deleteFile(String fileName){
@@ -91,30 +95,16 @@ public class Directory {
     public String getDirectoryName() {
         return directoryName;
     }
-
-    public boolean renameFile(String fileName, String newName){
-        File file = files.get(fileName);
-        if(file != null && !fileExist(newName)){
-            files.remove(fileName);
-            file.setFileName(newName);
-            addFile(file);
-            return true;
-        }
-        return false;
+    
+    public File findFile(String fileName){
+        return this.files.get(fileName);
+    }
+    
+    public Directory findDirectory(String dirName){
+        return this.directories.get(dirName);
     }
 
-    public boolean renameDirectory(String directoryName, String newName){
-        Directory directory = directories.get(directoryName);
-        if(directory != null && !directoryExist(newName)){
-            files.remove(directoryName);
-            directory.setDirectoryName(newName);
-            addDirectory(directory);
-            return true;
-        }
-        return false;
-    }
-
-    private void setDirectoryName(String directoryName) {
+    public void setDirectoryName(String directoryName) {
         this.directoryName = directoryName;
     }
 
@@ -124,6 +114,14 @@ public class Directory {
 
     public HashMap<String,File> getFiles() {
         return files;
+    }
+    
+    public void setFather(Directory father){
+        this.father = father;
+    }
+    
+    public Directory getFather(){
+        return this.father;
     }
 
     @Override
