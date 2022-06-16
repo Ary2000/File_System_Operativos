@@ -171,13 +171,17 @@ public class Consola extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private static void mainAux(){
-        ManejadorDD.crearDiscoDuro();
-        //Arbol arbol = new Arbol();
+        //ManejadorDD.crearDiscoDuro();
         
-        List<Integer> espaciosUsados = ManejadorDD.insertarEspacio("Nomb");
-        ManejadorDD.insertarEspacio("as");
-        ManejadorDD.eliminarEspacios(espaciosUsados);
-        ManejadorDD.insertarEspacio("jajaXD");
+        //List<Integer> espaciosUsados = ManejadorDD.insertarEspacio("Nomb");
+        //ManejadorDD.insertarEspacio("as");
+        //ManejadorDD.eliminarEspacios(espaciosUsados);
+        //ManejadorDD.insertarEspacio("jajaXD");
+        
+        Arbol arbol = new Arbol();
+        try{
+            arbol.copy("C:/Users/aryel/OneDrive/Documents/GitHub/File_System_Operativos/Fyle_system/archivosReales", "FS:/");
+        } catch(Exception e) {}
     }
     
     /**

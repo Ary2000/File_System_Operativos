@@ -5,6 +5,16 @@
  */
 package Tree;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 /**
  *
  * @author irsac
@@ -12,11 +22,15 @@ package Tree;
 public class Arbol {
     private final Directory root;
     private Directory actualDirectory;
+    //private ManejadorDD manejador;
 
+    private File archivoTemp;
+    private Directory directorioTemp;
     
     public Arbol(){
         root = new Directory("File System");
         this.actualDirectory = root;
+        ManejadorDD.crearDiscoDuro();
     }
     
     public boolean findDirectory(String dirName){
@@ -33,11 +47,187 @@ public class Arbol {
     }
     
     public boolean createFile(String fileName, String extension, String content){
-        File file = new File(fileName, extension, content, content.length());
+        ArrayList<Integer> registrosBase = new ArrayList<>();
+        ArrayList<Integer> registrosBases = ManejadorDD.insertarEspacio(content);
+        File file = new File(fileName, extension, content, registrosBases);
         return actualDirectory.addFile(file);
     }
     
     public void changeDirectory(){}
+    
+    private int verificarTipoDato(String ruta) {
+        String[] todosDirectorios = ruta.split("/"); 
+        String pasoFinal = todosDirectorios[todosDirectorios.length - 1];
+        String[] pasosFinales = pasoFinal.split("\\.");
+        if(pasosFinales.length == 2)
+            return 0;
+        return 1;
+    }
+    
+    private int revisarRutaVirtual(String rutaVirtual) {
+        String[] todosDirectorios = rutaVirtual.split("/"); 
+        directorioTemp = actualDirectory;
+        if(todosDirectorios[0].equals("FS:"))
+            directorioTemp = root;
+        for(int i = 1; i < todosDirectorios.length - 1; i++) {
+            directorioTemp = directorioTemp.findDirectory(todosDirectorios[i]);
+            if(directorioTemp == null)
+                return -1;
+        }
+        String pasoFinal = todosDirectorios[todosDirectorios.length-1];
+        String[] pasosFinales = pasoFinal.split("\\.");
+        if(pasosFinales.length == 1) {
+            directorioTemp.findDirectory(pasoFinal);
+            return 1;
+        }
+        archivoTemp = directorioTemp.findFile(pasoFinal);
+        return 0;
+    }
+    
+    public void insertarArchivo() {
+        
+    }
+    
+    static String rutaRealActual = "";
+    static Directory directorioVirtualActual = null;
+    
+    
+    static Path direccionRevisar = null;
+    //https://www.baeldung.com/java-folder-size
+    private int getTamanoDirectorio(Path path) {
+        direccionRevisar = path;
+        try {
+        long largo = Files.walk(direccionRevisar)
+                .filter(p -> p.toFile().isFile())
+                .mapToLong(p -> p.toFile().length())
+                .sum();
+        return (int)largo;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+    
+    public void insertarDirectorio(String rutaReal, Directory directorioVirtual) throws IOException{
+        rutaRealActual = rutaReal.replace("/", "\\");
+        directorioVirtualActual = directorioVirtual;
+        try (Stream<Path> paths = Files.walk(Paths.get(rutaReal))){
+                    paths
+                            .filter(Files::isRegularFile)
+                            .filter(p->p.getParent().toString().equals(rutaRealActual))
+                            .forEach(p->{
+                                try {
+                                    String[] nombreyExtension = p.getFileName().toString().split("\\.");
+                                    byte[] codificado = Files.readAllBytes(p.toAbsolutePath());
+                                    String contenidoOrigen = new String(codificado, StandardCharsets.UTF_8);
+                                    ArrayList<Integer> registrosBase = ManejadorDD.insertarEspacio(contenidoOrigen);
+                                    File archivo = new File(nombreyExtension[0], nombreyExtension[1], contenidoOrigen, registrosBase);
+                                    directorioVirtual.addFile(archivo);
+                                } catch(Exception e) {}
+                            });
+        }
+        try (Stream<Path> paths = Files.walk(Paths.get(rutaReal))){
+                    paths
+                            .filter(Files::isDirectory)
+                            .filter(p->p.getParent().toString().equals(rutaRealActual))
+                            .forEach(p->{
+                                Directory nuevoDirectorio = new Directory(p.getFileName().toString(), directorioVirtualActual);
+                                directorioVirtualActual.addDirectory(nuevoDirectorio);
+                                try{
+                                    insertarDirectorio(rutaReal + "/" + p.getFileName().toString(), nuevoDirectorio);
+                                }
+                                catch (Exception e) {}
+                            });
+        }
+    }
+    
+    public boolean copy(String rutaOrigen, String rutaDestino) throws IOException{
+        boolean esPrimeraRutaReal = false;
+        boolean esSegundaRutaReal = false;
+        String revisarPrimeros = rutaOrigen.substring(0, 2);
+        String revisarSegundos = rutaDestino.substring(0, 2);
+        if(revisarPrimeros.equals("C:"))
+            esPrimeraRutaReal = true;
+        if(revisarSegundos.equals("C:"))
+            esSegundaRutaReal = true;
+        if(esPrimeraRutaReal && esSegundaRutaReal) {
+            System.out.println("No se puede usar dos rutas reales");
+            return false;
+        }
+        String contenidoOrigen = "";
+        int resultado1 = -1;
+        int resultado2 = -1;
+        File archivo = null;
+        Directory directorio = null;
+        if(esPrimeraRutaReal) {
+            try{
+                if(verificarTipoDato(rutaOrigen) == 0) {
+                    byte[] codificado = Files.readAllBytes(Paths.get(rutaOrigen));
+                    contenidoOrigen = new String(codificado, StandardCharsets.UTF_8);
+                    resultado1 = 0;
+                    String[] seccionesRuta = rutaOrigen.split("/");
+                    String nombreArchivo = seccionesRuta[seccionesRuta.length - 1];
+                    String[] nombreYextencion = nombreArchivo.split("\\.");
+                    ArrayList<Integer> temp = new ArrayList<Integer>();
+                    archivo = new File(nombreYextencion[0] ,nombreYextencion[1], contenidoOrigen, temp );
+                }
+                else {
+                    resultado1 = 1;
+                };
+                    
+                }
+             catch (Exception e) {
+                System.out.println("El primer archivo no se puede abrir");
+                return false;
+            }
+        }
+        else {
+            resultado1 = revisarRutaVirtual(rutaOrigen);
+            archivo = archivoTemp;
+            directorio = directorioTemp;
+            if(resultado1 == -1){
+                System.out.println("Primera ruta no valida");
+                return false;
+            }
+            else if (resultado1 == 0) {
+                contenidoOrigen = archivo.getContent();
+            }
+        }
+        if(esSegundaRutaReal) {
+            
+        }
+        else {
+            resultado2 = revisarRutaVirtual(rutaDestino);
+            File archivoDestino = archivoTemp;
+            Directory directorioDestino = directorioTemp;
+            if(resultado1==0){
+                if(resultado2 == -1){
+                    System.out.println("Segunda ruta no valida");
+                    return false;
+                } 
+                if(resultado2 == 0) {
+                    System.out.println("Segunda ruta apunta a un archivo");
+                    return false;
+                }
+                if(resultado1 == 0) {
+                    archivoDestino = new File(archivo);
+                    if(archivoDestino.getSize() > ManejadorDD.cantidadSectoresVacios) {
+                        System.out.println("El archivo es muy grande para insertar en el disco duro");
+                        return false;
+                    }
+                    ArrayList<Integer> registrosBases = ManejadorDD.insertarEspacio(contenidoOrigen);
+                    archivoDestino.setRegistrosBase(registrosBases);
+                    directorioDestino.addFile(archivoDestino);
+                }
+            } else if(resultado1==1) {
+                if(getTamanoDirectorio(Paths.get(rutaOrigen)) > ManejadorDD.cantidadSectoresVacios * ManejadorDD.tamanoSectores) {
+                    System.out.println("No hay suficiente espacio en el disco duro");
+                    return false;
+                }
+                insertarDirectorio(rutaOrigen, directorioDestino);
+            }
+        }
+        return true;
+    }
     
     public void modFile(String fileName, String content){
         File file = actualDirectory.findFile(fileName);

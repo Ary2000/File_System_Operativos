@@ -21,13 +21,26 @@ public class File {
     private int size;
     private ArrayList<Integer> registrosBase;
 
-    public File(String name, String extension, String content, int size){
+    public File(String name, String extension, String content, ArrayList<Integer> registrosBase){
         this.fileName = name;
         this.extension = extension;
         this.content = content;
         this.creationDate = new Date();
         this.modificationDate = new Date();
         this.registrosBase = new ArrayList<>();
+        this.size = content.length();
+        this.registrosBase = registrosBase;
+    }
+    
+    public File(File file) {
+        this.fileName = file.getFileName();
+        this.extension = file.getExtension();
+        this.content = file.content;
+        this.creationDate = new Date();
+        this.modificationDate = new Date();
+        this.registrosBase = new ArrayList<>();
+        this.size = content.length();
+        this.registrosBase = new ArrayList<Integer>();
     }
 
     public String getFileName() {

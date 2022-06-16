@@ -46,21 +46,11 @@ public class ManejadorDD {
         return -1;
     }
     
-    public boolean revisarSiHayEspacio(String contenidoProceso) { 
-        int cantidadBytes = contenidoProceso.length();
-        List<Integer> sectoresUsados = new ArrayList();
-        int cantidadSectoresProceso = cantidadBytes / tamanoSectores;
-        if(cantidadBytes % tamanoSectores != 0)
-            cantidadSectoresProceso++;
-        if(cantidadSectoresProceso <= cantidadSectoresVacios) {
-            return true;
-        }
-        return false;
-    }
+    public static boolean revisarSiHayEspacio(String contenidoProceso) { return cantidadSectoresVacios > contenidoProceso.length() ? true : false; }
     
-    public static List<Integer> insertarEspacio(String contenidoProceso) {
+    public static  ArrayList<Integer> insertarEspacio(String contenidoProceso) {
         int cantidadBytes = contenidoProceso.length();
-        List<Integer> sectoresUsados = new ArrayList();
+        ArrayList<Integer> sectoresUsados = new ArrayList();
         int cantidadSectoresProceso = cantidadBytes / tamanoSectores;
         if(cantidadBytes % tamanoSectores != 0)
             cantidadSectoresProceso++;
