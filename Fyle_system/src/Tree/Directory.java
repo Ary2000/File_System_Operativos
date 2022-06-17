@@ -32,6 +32,17 @@ public class Directory {
         this.files = new HashMap<>();
         this.father = father;
     }
+    
+    public int conseguirTamanoDirectorio() {
+        int tamanoDirectorio = 0;
+        for(File archivo: files.values()) {
+            tamanoDirectorio += archivo.getSize();
+        }
+        for(Directory directorio: directories.values()) {
+            tamanoDirectorio += directorio.conseguirTamanoDirectorio();
+        }
+        return tamanoDirectorio;
+    }
 
     public boolean isEmpty(){
         return directories.isEmpty() && files.isEmpty();
@@ -91,7 +102,7 @@ public class Directory {
 
     public boolean addFile(File file){
         if(!fileExist(file.getFileName()+file.getExtension())){
-            files.put(file.getFileName()+file.getExtension(),file);
+            files.put(file.getFileName()+ "." +file.getExtension(),file);
             return true;
         }
         return false;

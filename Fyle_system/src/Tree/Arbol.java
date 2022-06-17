@@ -13,7 +13,9 @@ import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.stream.Stream;
+import java.io.*;
 
 /**
  *
@@ -74,10 +76,12 @@ public class Arbol {
             if(directorioTemp == null)
                 return -1;
         }
+        if(todosDirectorios.length == 1)
+            return 1;
         String pasoFinal = todosDirectorios[todosDirectorios.length-1];
         String[] pasosFinales = pasoFinal.split("\\.");
         if(pasosFinales.length == 1) {
-            directorioTemp.findDirectory(pasoFinal);
+            directorioTemp = directorioTemp.findDirectory(pasoFinal);
             return 1;
         }
         archivoTemp = directorioTemp.findFile(pasoFinal);
@@ -107,10 +111,14 @@ public class Arbol {
         }
     }
     
+    
     public void insertarDirectorio(String rutaReal, Directory directorioVirtual) throws IOException{
+        String nombreFolder = rutaReal.split("/")[rutaReal.split("/").length - 1];
+        Directory directorioNuevo = new Directory(nombreFolder, directorioVirtual); 
+        directorioVirtual.addDirectory(directorioNuevo);
         rutaRealActual = rutaReal.replace("/", "\\");
-        directorioVirtualActual = directorioVirtual;
-        try (Stream<Path> paths = Files.walk(Paths.get(rutaReal))){
+        directorioVirtualActual = directorioNuevo;
+        try (Stream<Path> paths = Files.walk(Paths.get(rutaRealActual))){
                     paths
                             .filter(Files::isRegularFile)
                             .filter(p->p.getParent().toString().equals(rutaRealActual))
@@ -121,25 +129,56 @@ public class Arbol {
                                     String contenidoOrigen = new String(codificado, StandardCharsets.UTF_8);
                                     ArrayList<Integer> registrosBase = ManejadorDD.insertarEspacio(contenidoOrigen);
                                     File archivo = new File(nombreyExtension[0], nombreyExtension[1], contenidoOrigen, registrosBase);
-                                    directorioVirtual.addFile(archivo);
+                                    directorioVirtualActual.addFile(archivo);
                                 } catch(Exception e) {}
                             });
         }
-        try (Stream<Path> paths = Files.walk(Paths.get(rutaReal))){
+        try (Stream<Path> paths = Files.walk(Paths.get(rutaRealActual))){
                     paths
                             .filter(Files::isDirectory)
-                            .filter(p->p.getParent().toString().equals(rutaRealActual))
+                            .filter(p-> p.getParent().toString().equals(rutaRealActual))
                             .forEach(p->{
-                                Directory nuevoDirectorio = new Directory(p.getFileName().toString(), directorioVirtualActual);
-                                directorioVirtualActual.addDirectory(nuevoDirectorio);
                                 try{
-                                    insertarDirectorio(rutaReal + "/" + p.getFileName().toString(), nuevoDirectorio);
+                                    insertarDirectorio(rutaRealActual + "/" + p.getFileName().toString(), directorioVirtualActual);
                                 }
                                 catch (Exception e) {}
                             });
         }
     }
     
+    //https://www.geeksforgeeks.org/traverse-through-a-hashmap-in-java/
+    public void directoriosVirualAReal(String rutaDestino, Directory directorioVirtual) {
+        try{
+            for(Map.Entry mapElement:directorioVirtual.getDirectories().entrySet()) {
+                Directory directorioActual = (Directory)mapElement.getValue();
+                String rutaNuevoDirectorio = rutaDestino + "/" + directorioActual.getDirectoryName();
+                Files.createDirectories(Paths.get(rutaNuevoDirectorio));
+                directoriosVirualAReal(rutaNuevoDirectorio, directorioActual);
+            }
+            for(Map.Entry mapElement:directorioVirtual.getFiles().entrySet()) {
+                File fileActual = (File)mapElement.getValue();
+                String rutaNuevoArchivo = rutaDestino + "/" + fileActual.getFileName() + "." + fileActual.getExtension();
+                Files.createFile(Paths.get(rutaNuevoArchivo));
+                byte[] contenidoArchivo = fileActual.getContent().getBytes();
+                Files.write(Paths.get(rutaNuevoArchivo), contenidoArchivo);
+            }
+        } catch(Exception e) {}
+    }
+    
+    Directory copiarDirectorio(Directory directoryACopiar) {
+        Directory directorioCopia = new Directory(directoryACopiar.getDirectoryName());
+        for (Directory directorioHijo: directoryACopiar.getDirectories().values()) {
+            directorioCopia.addDirectory(copiarDirectorio(directorioHijo));
+        }
+        for (File archivoCopiar: directoryACopiar.getFiles().values()) {
+            File archivoCopia = new File(archivoCopiar);
+            archivoCopia.setRegistrosBase(ManejadorDD.insertarEspacio(archivoCopiar.getContent()));
+            directorioCopia.addFile(archivoCopia);
+        }
+        return directorioCopia;
+    }
+    
+    //No usar rutas con espacios
     public boolean copy(String rutaOrigen, String rutaDestino) throws IOException{
         boolean esPrimeraRutaReal = false;
         boolean esSegundaRutaReal = false;
@@ -193,7 +232,15 @@ public class Arbol {
             }
         }
         if(esSegundaRutaReal) {
-            
+            if(resultado1 == 0) {
+                String rutaNuevo = rutaDestino + "/" + archivo.getFileName() + "." + archivo.getExtension();
+                Files.createFile(Paths.get(rutaNuevo));
+                byte[] contenidoArchivo = archivo.getContent().getBytes();
+                Files.write(Paths.get(rutaNuevo), contenidoArchivo);
+            }
+            else if(resultado1 == 1) {
+                directoriosVirualAReal(rutaDestino, directorio);
+            }
         }
         else {
             resultado2 = revisarRutaVirtual(rutaDestino);
@@ -210,7 +257,7 @@ public class Arbol {
                 }
                 if(resultado1 == 0) {
                     archivoDestino = new File(archivo);
-                    if(archivoDestino.getSize() > ManejadorDD.cantidadSectoresVacios) {
+                    if(archivoDestino.getSize() > ManejadorDD.cantidadSectoresVacios * ManejadorDD.tamanoSectores) {
                         System.out.println("El archivo es muy grande para insertar en el disco duro");
                         return false;
                     }
@@ -219,11 +266,20 @@ public class Arbol {
                     directorioDestino.addFile(archivoDestino);
                 }
             } else if(resultado1==1) {
-                if(getTamanoDirectorio(Paths.get(rutaOrigen)) > ManejadorDD.cantidadSectoresVacios * ManejadorDD.tamanoSectores) {
-                    System.out.println("No hay suficiente espacio en el disco duro");
-                    return false;
+                if(esPrimeraRutaReal){
+                    if(getTamanoDirectorio(Paths.get(rutaOrigen)) > ManejadorDD.cantidadSectoresVacios * ManejadorDD.tamanoSectores) {
+                        System.out.println("No hay suficiente espacio en el disco duro");
+                        return false;
+                    }
+                    insertarDirectorio(rutaOrigen, directorioDestino);
                 }
-                insertarDirectorio(rutaOrigen, directorioDestino);
+                else {
+                    if(directorio.conseguirTamanoDirectorio() > ManejadorDD.cantidadSectoresVacios * ManejadorDD.tamanoSectores) {
+                        System.out.println("No hay suficiente espacio en el disco duro");
+                        return false;
+                    }
+                    directorioDestino.addDirectory(copiarDirectorio(directorio));
+                }
             }
         }
         return true;

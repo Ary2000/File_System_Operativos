@@ -52,6 +52,7 @@ public class ManejadorDD {
         int cantidadBytes = contenidoProceso.length();
         ArrayList<Integer> sectoresUsados = new ArrayList();
         int cantidadSectoresProceso = cantidadBytes / tamanoSectores;
+        int cantidadSectoresResta = cantidadSectoresProceso;
         if(cantidadBytes % tamanoSectores != 0)
             cantidadSectoresProceso++;
         if(cantidadSectoresProceso <= cantidadSectores) {
@@ -80,7 +81,7 @@ public class ManejadorDD {
                 System.out.println(e); 
             }
         }
-        cantidadSectoresVacios -= cantidadSectoresProceso;
+        cantidadSectoresVacios -= cantidadSectoresResta;
         return sectoresUsados;
     }
     

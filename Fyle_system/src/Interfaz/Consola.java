@@ -181,6 +181,7 @@ public class Consola extends javax.swing.JFrame {
         Arbol arbol = new Arbol();
         try{
             arbol.copy("C:/Users/aryel/OneDrive/Documents/GitHub/File_System_Operativos/Fyle_system/archivosReales", "FS:/");
+            arbol.copy("FS:/archivosReales", "FS:/archivosReales/Cosa");
         } catch(Exception e) {}
     }
     
