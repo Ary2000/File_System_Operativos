@@ -99,6 +99,7 @@ public class ManejadorDD {
         cantidadSectoresVacios += sectoresUsados.size();
     }
     
+    // CREATE
     public static void crearDiscoDuro() {
         cantidadSectores = inputInteger("Inserte el tamaño del disco: ");
         tamanoSectores = inputInteger("Inserte el tamaño de un sector: ");
