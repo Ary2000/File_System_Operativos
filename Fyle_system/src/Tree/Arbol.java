@@ -185,6 +185,21 @@ public class Arbol {
         return directorioCopia;
     }
     
+    //MoVer
+    public boolean move(String route, String name, String newName, boolean hasExtension){
+        boolean result = false;
+        Directory destiny;
+        int type = revisarRutaVirtual(route);
+        if(type == 1){
+            if(hasExtension && renameFile(name, newName)){
+                File file = actualDirectory.findFile(newName);
+            }else if (renameDirectory(name, newName)){
+                Directory dir = actualDirectory.findDirectory(newName);
+            }
+        }
+        return result;
+    }
+    
     //COPY
     //No usar rutas con espacios
     public boolean copy(String rutaOrigen, String rutaDestino) throws IOException{
@@ -320,8 +335,9 @@ public class Arbol {
     }
     
     //FIND
-    public String find(String name){
-        return "";
+    public ArrayList<String> find(String name){
+        ArrayList<String> found = new ArrayList<>();
+        return found;
     }
     
     public boolean renameFile(String fileName, String newName){
