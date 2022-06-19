@@ -188,13 +188,24 @@ public class Arbol {
     //MoVer
     public boolean move(String route, String name, String newName, boolean hasExtension){
         boolean result = false;
-        Directory destiny;
         int type = revisarRutaVirtual(route);
         if(type == 1){
-            if(hasExtension && renameFile(name, newName)){
-                File file = actualDirectory.findFile(newName);
-            }else if (renameDirectory(name, newName)){
-                Directory dir = actualDirectory.findDirectory(newName);
+            if(hasExtension && !directorioTemp.fileExist(newName)){
+                File file = actualDirectory.removeFile(name);
+                if(file != null){
+                    file.setFileName(newName);
+                    file.setModificationDate();
+                    directorioTemp.addFile(file);
+                    result = true;
+                }
+            }else if (!directorioTemp.directoryExist(newName)){
+                Directory dir = actualDirectory.removeDirectory(name);
+                if(dir != null){
+                    dir.setFather(directorioTemp);
+                    dir.setDirectoryName(newName);
+                    directorioTemp.addDirectory(dir);
+                    result = true;
+                }
             }
         }
         return result;
