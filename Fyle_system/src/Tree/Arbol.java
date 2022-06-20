@@ -339,6 +339,8 @@ public class Arbol {
         file.setContent(content);
         file.setModificationDate();
         file.setSize(content.length());
+        ManejadorDD.eliminarEspacios(file.getRegistrosBase());
+        file.setRegistrosBase(ManejadorDD.insertarEspacio(content));
     }
     
     //VerPropiedades

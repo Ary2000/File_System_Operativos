@@ -147,7 +147,8 @@ public class Hilo extends Thread{
                     content += instruccions[i] + " ";
                 }
                 System.out.println("Se Creo un nuevo archivo");
-                arbolCreado.createFile(nombre[0], nombre[1], content);
+                arbolCreado.createFile(nombre[0], nombre[1], content.substring(0, content.length()-1));
+                //arbolCreado.createFile(nombre[0], nombre[1], content);
 
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
@@ -189,7 +190,7 @@ public class Hilo extends Thread{
                 for (int i = 2; i < instruccions.length; i++) {
                     content2 += instruccions[i] + " ";
                 }
-              arbolCreado.modFile(instruccions[1], content2);
+              arbolCreado.modFile(instruccions[1], content2.substring(0, content2.length()-1));
               //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 7:
