@@ -178,7 +178,7 @@ public class Consola extends javax.swing.JFrame {
         //ManejadorDD.eliminarEspacios(espaciosUsados);
         //ManejadorDD.insertarEspacio("jajaXD");
         
-        Arbol arbol = new Arbol();
+        Arbol arbol = new Arbol(1,1);
         try{
             arbol.copy("C:/Users/aryel/OneDrive/Documents/GitHub/File_System_Operativos/Fyle_system/archivosReales", "FS:/");
             arbol.copy("FS:/archivosReales", "FS:/archivosReales/Cosa");
@@ -216,7 +216,7 @@ public class Consola extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 mainAux();
-                new Consola().setVisible(true);
+                //new Consola().setVisible(true);
             }
         });
     }

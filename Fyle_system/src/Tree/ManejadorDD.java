@@ -99,9 +99,9 @@ public class ManejadorDD {
         cantidadSectoresVacios += sectoresUsados.size();
     }
     
-    public static void crearDiscoDuro() {
-        cantidadSectores = inputInteger("Inserte el tamaño del disco: ");
-        tamanoSectores = inputInteger("Inserte el tamaño de un sector: ");
+    public static void crearDiscoDuro(int varCantidadSectores,int varTamanoSectores) {
+        cantidadSectores = varCantidadSectores;//inputInteger("Inserte el tamaño del disco: ");
+        tamanoSectores = varTamanoSectores;//inputInteger("Inserte el tamaño de un sector: ");
         //String contenidoDisco = "0".repeat(cantidadSectores*tamanoSectores);
         char[] contenidoDisco = new char[cantidadSectores*tamanoSectores];
         Arrays.fill(contenidoDisco, '0');
@@ -117,7 +117,7 @@ public class ManejadorDD {
             Arrays.fill(sectores, 0);
             //sectores = IntStream.range(0, cantidadSectores).toArray();
             //sectores = Arrays.stream(arregloEspacios).boxed().collect( Collectors.toList() );
-            System.out.println("Done");
+            //System.out.println("Done");
 
         } catch (IOException e) {
             throw new RuntimeException(e);

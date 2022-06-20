@@ -23,16 +23,16 @@ import java.io.*;
  */
 public class Arbol {
     private final Directory root;
-    private Directory actualDirectory;
+    public Directory actualDirectory;
     //private ManejadorDD manejador;
 
     private File archivoTemp;
     private Directory directorioTemp;
     
-    public Arbol(){
+    public Arbol(int varCantidadSectores,int varTamanoSectores){
         root = new Directory("File System");
         this.actualDirectory = root;
-        ManejadorDD.crearDiscoDuro();
+        ManejadorDD.crearDiscoDuro(varCantidadSectores,varTamanoSectores);
     }
     
     public boolean findDirectory(String dirName){
