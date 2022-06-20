@@ -148,6 +148,7 @@ public class Hilo extends Thread{
                 }
                 System.out.println("Se Creo un nuevo archivo");
                 arbolCreado.createFile(nombre[0], nombre[1], content);
+
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
               // code block
