@@ -92,6 +92,9 @@ public class Hilo extends Thread{
                         else if(i==5 && input.length>2){
                             instructorCalls(input,i+1);   
                         }
+                        else if(i==9 && input.length>3){
+                            instructorCalls(input,i+1);   
+                        }
                         else{
                             System.out.println("[ERROR] Falta asignar algún parametro");
                         }
@@ -136,10 +139,14 @@ public class Hilo extends Thread{
             case 2:
                 //se debe poder ingresar el contenido de forma separada
                 nombre = instruccions[1].split("\\.");
+                if(nombre.length<2){
+                    break;
+                }
                 String content = "";
                 for (int i = 2; i < instruccions.length; i++) {
                     content += instruccions[i] + " ";
                 }
+                System.out.println("Se Creo un nuevo archivo");
                 arbolCreado.createFile(nombre[0], nombre[1], content);
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
@@ -147,9 +154,11 @@ public class Hilo extends Thread{
               break;
             case 3:
                 // se debe validad que el directorio venga sin extension
-              arbolCreado.createDirectory(instruccions[1]);
-              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
-              // code block
+                nombre = instruccions[1].split("\\.");
+                if(nombre.length<2){
+                    System.out.println("Se Creo un nuevo directorio");
+                    arbolCreado.createDirectory(instruccions[1]);
+                }
               break;
             case 4:
               // cambiarDir
@@ -196,11 +205,23 @@ public class Hilo extends Thread{
               break;
             case 10:
                 nombre = instruccions[1].split("\\."); 
-                if(nombre.length==2){
-                    arbolCreado.move(instruccions[2], instruccions[1], nombre[0], true);
-                }else{
-                    arbolCreado.move(instruccions[2], instruccions[1], nombre[0], false);
+                if(instruccions.length>3){
+                    if(nombre.length==2){
+                        arbolCreado.move(instruccions[2], instruccions[1], instruccions[3], true);
+                    }else{
+                        arbolCreado.move(instruccions[2], instruccions[1], instruccions[3], false);
+                    }
+                    System.out.println("Se ha movido el archivo con un nombre distinto");
                 }
+                else{
+                    if(nombre.length==2){
+                        arbolCreado.move(instruccions[2], instruccions[1], nombre[0], true);
+                    }else{
+                        arbolCreado.move(instruccions[2], instruccions[1], nombre[0], false);
+                    }
+                    System.out.println("Se ha movido el archivo");
+                }
+                
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 11:
