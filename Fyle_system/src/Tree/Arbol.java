@@ -16,6 +16,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  *
@@ -26,11 +30,11 @@ public class Arbol {
     public Directory actualDirectory;
     //private ManejadorDD manejador;
 
-    private File archivoTemp;
-    private Directory directorioTemp;
+    public File archivoTemp;
+    public Directory directorioTemp;
     
     public Arbol(int varCantidadSectores,int varTamanoSectores){
-        root = new Directory("File System");
+        root = new Directory("FS");
         this.actualDirectory = root;
         ManejadorDD.crearDiscoDuro(varCantidadSectores,varTamanoSectores);
     }
@@ -70,10 +74,10 @@ public class Arbol {
     }
     
     //Revisa que la ruta virtual exista
-    private int revisarRutaVirtual(String rutaVirtual) {
+    public int revisarRutaVirtual(String rutaVirtual) {
         String[] todosDirectorios = rutaVirtual.split("/"); 
         directorioTemp = actualDirectory;
-        if(todosDirectorios[0].equals("FS:"))
+        if(todosDirectorios[0].equals("FS")) 
             directorioTemp = root;
         for(int i = 1; i < todosDirectorios.length - 1; i++) {
             directorioTemp = directorioTemp.findDirectory(todosDirectorios[i]);
@@ -347,7 +351,7 @@ public class Arbol {
     
     //FIND
     public ArrayList<String> find(String name){
-        ArrayList<String> found = findAux(name, "FS/", root);
+        ArrayList<String> found = findAux(name, "", root);
         return found;
     }
     
@@ -363,7 +367,7 @@ public class Arbol {
         for(Map.Entry fileEntry: dir.getFiles().entrySet()){
             File file = (File) fileEntry.getValue();
             if(file.getFileName().equals(name) || file.getExtension().equals(name) || (file.getFileName() + file.getExtension()).equals(name)){
-                match.add(route + (file.getFileName() + file.getExtension()));
+                match.add(route + (file.getFileName() +"."+file.getExtension()));
             }
         }
         return match;
@@ -412,4 +416,45 @@ public class Arbol {
         }
         return false;
     }
+ 
+    public void imprimirArbol(){
+        imprimirArbolAux(root,1);
+    }
+    
+    private void imprimirArbolAux(Directory dir,int cont){
+        char[] charArray = new char[cont];
+        Arrays.fill(charArray, ' ');
+        System.out.println(new String(charArray)+dir.getDirectoryName());
+        for(Directory directoryEntry: dir.getDirectories().values()){
+            imprimirArbolAux(directoryEntry,cont+1);
+        }
+        for(File fileEntry: dir.getFiles().values()){
+            System.out.println(new String(charArray)+" "+ fileEntry.getFileName() + "." + fileEntry.getExtension());
+        }
+    }
+    
+    /*
+
+    public void imprimirArbol(Directory directorioRaiz){
+        /*"├── "
+        "│   "
+        "└── "
+        "    "*/
+        /*HashMap<String,Directory> varDirectories = root.getDirectories();
+        HashMap<String,File> varFiles = root.getFiles();
+        
+        for (Integer key: map.keySet()){  
+                System.out.println(key+ " = " + map.get(key));
+        } */
+        /*
+        for (Iterator<TreeNode> it = children.iterator(); it.hasNext();) {
+            TreeNode next = it.next();
+            if (it.hasNext()) {
+                next.print(buffer, childrenPrefix + "├── ", childrenPrefix + "│   ");
+            } else {
+                next.print(buffer, childrenPrefix + "└── ", childrenPrefix + "    ");
+            }
+        }
+    }*/
+    
 }

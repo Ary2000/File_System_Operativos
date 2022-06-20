@@ -9,6 +9,8 @@ package Interfaz;
 
 import Tree.Arbol;
 import Tree.Directory;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Scanner;
@@ -22,9 +24,10 @@ import java.util.Scanner;
 public class Hilo extends Thread{
     private int velocidad;
     private boolean ejecutar = false; 
-    public String dirActual = "Ingrese su instruccion:";
+    public String dirActual = "/>";
     private boolean create = false;
     private Arbol arbolCreado;
+    public String[] nombre;
     private String[] palabrasReservadas = {
         "CREATE",
         "FILE",
@@ -42,19 +45,19 @@ public class Hilo extends Thread{
     };
     private int[] espacios = {3,3,2,2,1,3,2,2,3,3,2,2,1};
     /*
-    int,int; SI
-    stringContenido,stringnombre.extension; SI
-    nombreDirectorio; SI
-    RECIBE 1 RUTA; 
-    nada;
-    1 NOMBRE.EXTENSION Y UN STRING;
-    NOMBRE.EXTENSION;
-    NOMBRE.EXTENSION;
-    STRING.RUTA,STRING.RUTA;
-    NOMBRE.TXT O SIN .TXT Y DIRECCION DONDE SE VA A MOVER;
-    NOMBRE.TXT O SIN .TXT;
-    STRING;
-    NADA;*/
+    1.int,int; SI
+    2.stringContenido,stringnombre.extension; SI
+    3.nombreDirectorio; SI
+    4.RECIBE 1 RUTA; 
+    5. nada;
+    6.1 NOMBRE.EXTENSION Y UN STRING;
+    7.NOMBRE.EXTENSION;
+    8.NOMBRE.EXTENSION;
+    9.STRING.RUTA,STRING.RUTA;
+    10.NOMBRE.TXT O SIN .TXT Y DIRECCION DONDE SE VA A MOVER;
+    11.NOMBRE.TXT O SIN .TXT;
+    12.STRING;
+    13.NADA;*/
     
 
     public Hilo(int velocidad) {
@@ -87,6 +90,8 @@ public class Hilo extends Thread{
         }
         catch(InterruptedException e){
             System.out.println(e.getMessage());
+        } catch (IOException ex) {
+            Logger.getLogger(Hilo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     public void iniciar(){
@@ -100,7 +105,7 @@ public class Hilo extends Thread{
             ejecutar = false;
         }
     }
-    public void instructorCalls(String[] instruccions,int instrNumber){
+    public void instructorCalls(String[] instruccions,int instrNumber) throws IOException{
         Arbol arbol;
         switch(instrNumber) {
             case 1:
@@ -117,48 +122,80 @@ public class Hilo extends Thread{
                 break;
             case 2:
                 //se debe poder ingresar el contenido de forma separada
-                String nombre[] = instruccions[1].split("\\."); 
+                nombre = instruccions[1].split("\\."); 
                 arbolCreado.createFile(nombre[0], nombre[1], instruccions[2]);
+                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
               // code block
               break;
             case 3:
                 // se debe validad que el directorio venga sin extension
               arbolCreado.createDirectory(instruccions[1]);
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               // code block
               break;
             case 4:
-              // code block
+              // cambiarDir
+                if(arbolCreado.revisarRutaVirtual(instruccions[1])==-1){
+                    System.out.println("Ruta no existe");
+                }
+                else if(arbolCreado.revisarRutaVirtual(instruccions[1])==0){
+                    System.out.println("Ruta apunta a un archivo");
+                }
+                else{
+                    arbolCreado.actualDirectory = arbolCreado.directorioTemp;
+                    dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                }
               break;
             case 5:
-              // code block
+              //actual directorio,imprimir nombres  
+              System.out.println(arbolCreado.actualDirectory.toString());
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 6:
-              // code block
+              arbolCreado.modFile(instruccions[1], instruccions[2]);
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 7:
-              // code block
+              System.out.println(arbolCreado.fileProperties(instruccions[1]));
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 8:
-              // code block
+              System.out.println(arbolCreado.fileContent(instruccions[1]));
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 9:
-              // code block
+              arbolCreado.copy(instruccions[1],instruccions[2]);
+              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 10:
-              // code block
+                nombre = instruccions[1].split("\\."); 
+                if(nombre.length==2){
+                    arbolCreado.move(arbolCreado.actualDirectory.getDirectoryName(), instruccions[1], instruccions[2], true);
+                }else{
+                    arbolCreado.move(arbolCreado.actualDirectory.getDirectoryName(), instruccions[1], instruccions[2], false);
+                }
+                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 11:
-              // code block
+                nombre = instruccions[1].split("\\."); 
+                if(nombre.length==2){
+                    arbolCreado.actualDirectory.removeFile(instruccions[1]);
+                }else{
+                    arbolCreado.actualDirectory.removeDirectory(instruccions[1]);
+                }
+                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 12:
-              // code block
+                ArrayList<String> found = arbolCreado.find(instruccions[1]);
+                for (int i = 0; i < found.size(); i++) {
+                    System.out.println(found.get(i));
+                }
+                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 13:
-              // code block
+                arbolCreado.imprimirArbol();
               break;
-            default:
-              // code block
           }
     }
 }
