@@ -64,6 +64,13 @@ public class Hilo extends Thread{
         this.velocidad = velocidad;
     }
     
+    public boolean revisarSiRutaEsAbsoluta(String ruta) {
+        String[] pasos = ruta.split("/");
+        if(pasos[0].equals("FS"))
+            return true;
+        return false;
+    }
+    
     @Override
     public void run(){
         try{
@@ -124,49 +131,54 @@ public class Hilo extends Thread{
                 //se debe poder ingresar el contenido de forma separada
                 nombre = instruccions[1].split("\\."); 
                 arbolCreado.createFile(nombre[0], nombre[1], instruccions[2]);
-                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
               // code block
               break;
             case 3:
                 // se debe validad que el directorio venga sin extension
               arbolCreado.createDirectory(instruccions[1]);
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               // code block
               break;
             case 4:
               // cambiarDir
-                if(arbolCreado.revisarRutaVirtual(instruccions[1])==-1){
+                int resultado = arbolCreado.revisarRutaVirtual(instruccions[1]);
+                if(resultado ==-1){
                     System.out.println("Ruta no existe");
                 }
-                else if(arbolCreado.revisarRutaVirtual(instruccions[1])==0){
+                else if(resultado==0){
                     System.out.println("Ruta apunta a un archivo");
                 }
                 else{
                     arbolCreado.actualDirectory = arbolCreado.directorioTemp;
-                    dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                    if(revisarSiRutaEsAbsoluta(instruccions[1]))
+                        dirActual = instruccions[1] + "/>";
+                    else
+                        dirActual = dirActual.substring(0, dirActual.length() - 1) + instruccions[1] + "/>";
+                        //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 }
               break;
             case 5:
               //actual directorio,imprimir nombres  
               System.out.println(arbolCreado.actualDirectory.toString());
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 6:
               arbolCreado.modFile(instruccions[1], instruccions[2]);
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 7:
               System.out.println(arbolCreado.fileProperties(instruccions[1]));
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 8:
               System.out.println(arbolCreado.fileContent(instruccions[1]));
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 9:
               arbolCreado.copy(instruccions[1],instruccions[2]);
-              dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+              //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 10:
                 nombre = instruccions[1].split("\\."); 
@@ -175,7 +187,7 @@ public class Hilo extends Thread{
                 }else{
                     arbolCreado.move(arbolCreado.actualDirectory.getDirectoryName(), instruccions[1], instruccions[2], false);
                 }
-                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 11:
                 nombre = instruccions[1].split("\\."); 
@@ -184,14 +196,14 @@ public class Hilo extends Thread{
                 }else{
                     arbolCreado.actualDirectory.removeDirectory(instruccions[1]);
                 }
-                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 12:
                 ArrayList<String> found = arbolCreado.find(instruccions[1]);
                 for (int i = 0; i < found.size(); i++) {
                     System.out.println(found.get(i));
                 }
-                dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
+                //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 13:
                 arbolCreado.imprimirArbol();

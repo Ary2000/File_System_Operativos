@@ -75,27 +75,35 @@ public class Arbol {
     
     //Revisa que la ruta virtual exista
     public int revisarRutaVirtual(String rutaVirtual) {
-        String[] todosDirectorios = rutaVirtual.split("/"); 
+        ArrayList<String> todosDirectorios = new ArrayList<String>(Arrays.asList(rutaVirtual.split("/"))); 
         directorioTemp = actualDirectory;
-        if(todosDirectorios[0].equals("FS")) 
+        if(todosDirectorios.get(0).equals("FS")){ 
             directorioTemp = root;
-        for(int i = 1; i < todosDirectorios.length - 1; i++) {
-            directorioTemp = directorioTemp.findDirectory(todosDirectorios[i]);
+            todosDirectorios.remove(0);
+        }
+        for(int i = 0; i < todosDirectorios.size() - 1; i++) {
+            directorioTemp = directorioTemp.findDirectory(todosDirectorios.get(i));
             if(directorioTemp == null)
                 //Ruta virtual no es valida
                 return -1;
         }
-        if(todosDirectorios.length == 1)
+        if(todosDirectorios.size() == 0)
             return 1;
-        String pasoFinal = todosDirectorios[todosDirectorios.length-1];
+        String pasoFinal = todosDirectorios.get(todosDirectorios.size()-1);
         String[] pasosFinales = pasoFinal.split("\\.");
+        //if(todosDirectorios.length == 1)
+        //    return 1;
         if(pasosFinales.length == 1) {
             directorioTemp = directorioTemp.findDirectory(pasoFinal);
+            if(directorioTemp == null)
+                return -1;
             //Ruta virtual apunta a un directorio
             return 1;
         }
         archivoTemp = directorioTemp.findFile(pasoFinal);
         //Ruta virtual apunta a un archivo
+        if(archivoTemp == null)
+            return -1;
         return 0;
     }
     
@@ -277,7 +285,9 @@ public class Arbol {
                 Files.write(Paths.get(rutaNuevo), contenidoArchivo);
             }
             else if(resultado1 == 1) {
-                directoriosVirualAReal(rutaDestino, directorio);
+                String direccionFinal = rutaDestino + "/" + directorio.getDirectoryName();
+                Files.createDirectories(Paths.get(direccionFinal));
+                directoriosVirualAReal(direccionFinal, directorio);
             }
         }
         else {
