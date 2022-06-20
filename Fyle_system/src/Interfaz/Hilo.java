@@ -140,7 +140,7 @@ public class Hilo extends Thread{
                 for (int i = 2; i < instruccions.length; i++) {
                     content += instruccions[i] + " ";
                 }
-                arbolCreado.createFile(nombre[0], nombre[1], content);
+                arbolCreado.createFile(nombre[0], nombre[1], content.substring(0, content.length()-1));
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
               // code block
