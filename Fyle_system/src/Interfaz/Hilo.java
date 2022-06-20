@@ -86,6 +86,12 @@ public class Hilo extends Thread{
                             //Significa que la entrada es correcta
                             instructorCalls(input,i+1);
                         }
+                        else if(i==1 && input.length>2){
+                            instructorCalls(input,i+1);   
+                        }
+                        else if(i==5 && input.length>2){
+                            instructorCalls(input,i+1);   
+                        }
                         else{
                             System.out.println("[ERROR] Falta asignar algún parametro");
                         }
@@ -129,8 +135,12 @@ public class Hilo extends Thread{
                 break;
             case 2:
                 //se debe poder ingresar el contenido de forma separada
-                nombre = instruccions[1].split("\\."); 
-                arbolCreado.createFile(nombre[0], nombre[1], instruccions[2]);
+                nombre = instruccions[1].split("\\.");
+                String content = "";
+                for (int i = 2; i < instruccions.length; i++) {
+                    content += instruccions[i] + " ";
+                }
+                arbolCreado.createFile(nombre[0], nombre[1], content);
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
                 //System.out.println("n:"+nombre[0]+"e"+nombre[1]+"cont"+instruccions[2]);
               // code block
@@ -161,11 +171,15 @@ public class Hilo extends Thread{
               break;
             case 5:
               //actual directorio,imprimir nombres  
-              System.out.println(arbolCreado.actualDirectory.toString());
+              arbolCreado.listarDir();
               //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 6:
-              arbolCreado.modFile(instruccions[1], instruccions[2]);
+                String content2 = "";
+                for (int i = 2; i < instruccions.length; i++) {
+                    content2 += instruccions[i] + " ";
+                }
+              arbolCreado.modFile(instruccions[1], content2);
               //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
             case 7:
@@ -183,9 +197,9 @@ public class Hilo extends Thread{
             case 10:
                 nombre = instruccions[1].split("\\."); 
                 if(nombre.length==2){
-                    arbolCreado.move(arbolCreado.actualDirectory.getDirectoryName(), instruccions[1], instruccions[2], true);
+                    arbolCreado.move(instruccions[2], instruccions[1], nombre[0], true);
                 }else{
-                    arbolCreado.move(arbolCreado.actualDirectory.getDirectoryName(), instruccions[1], instruccions[2], false);
+                    arbolCreado.move(instruccions[2], instruccions[1], nombre[0], false);
                 }
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;

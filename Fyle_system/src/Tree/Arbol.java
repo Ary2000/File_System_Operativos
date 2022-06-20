@@ -426,6 +426,20 @@ public class Arbol {
         }
         return false;
     }
+    
+    public void listarDir(){
+        System.out.print("Directorio Actual: ");
+        System.out.println(this.actualDirectory.getDirectoryName() + "{");
+        for (String clave:this.actualDirectory.getFiles().keySet()) {
+            File valor = this.actualDirectory.getFiles().get(clave);
+            System.out.println("Archivo: " + clave );
+        }
+        for (String clave:this.actualDirectory.getDirectories().keySet()) {
+            Directory valor = this.actualDirectory.getDirectories().get(clave);
+            System.out.println("Directorio: " + clave );
+        }
+        System.out.println("}");
+    }
  
     public void imprimirArbol(){
         imprimirArbolAux(root,1);
