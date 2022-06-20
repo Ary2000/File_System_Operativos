@@ -361,22 +361,23 @@ public class Arbol {
     
     //FIND
     public ArrayList<String> find(String name){
-        ArrayList<String> found = findAux(name, "", root);
+        ArrayList<String> found = findAux(name, "FS/", root);
         return found;
     }
     
     private ArrayList<String> findAux(String name, String route, Directory dir){
         ArrayList<String> match = new ArrayList<>();
         if(dir.getDirectoryName().equals(name)){
-            match.add(route + name);
+            match.add(route);
         }
         for(Map.Entry directoryEntry: dir.getDirectories().entrySet()){
             Directory directory = (Directory) directoryEntry.getValue();
-            match.addAll(findAux(name,route + dir.getDirectoryName() + "/", directory));
+            match.addAll(findAux(name, route + directory.getDirectoryName() + "/", directory));
         }
         for(Map.Entry fileEntry: dir.getFiles().entrySet()){
             File file = (File) fileEntry.getValue();
-            if(file.getFileName().equals(name) || file.getExtension().equals(name) || (file.getFileName() + file.getExtension()).equals(name)){
+            if(file.getFileName().equals(name) || file.getExtension().equals(name) || (file.getFileName() + file.getExtension()).equals(name)
+                    || name.equals("." + file.getExtension()) || (file.getFileName() + "." + file.getExtension()).equals(name)){
                 match.add(route + (file.getFileName() +"."+file.getExtension()));
             }
         }
