@@ -116,6 +116,14 @@ public class Directory {
         }
         return null;
     }
+    
+    public Directory removeDirectory(String dirName){
+        return directories.remove(dirName);
+    }
+    
+    public File removeFile(String fileName){
+        return files.remove(fileName);
+    }
 
     public String getDirectoryName() {
         return directoryName;

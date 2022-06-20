@@ -43,11 +43,13 @@ public class Arbol {
         return this.actualDirectory.fileExist(fileName);
     }
     
+    //MKDIR
     public boolean createDirectory(String dirName){
         Directory dir = new Directory(dirName, actualDirectory);
         return actualDirectory.addDirectory(dir);
     }
     
+    //FILE
     public boolean createFile(String fileName, String extension, String content){
         ArrayList<Integer> registrosBase = new ArrayList<>();
         ArrayList<Integer> registrosBases = ManejadorDD.insertarEspacio(content);
@@ -55,6 +57,7 @@ public class Arbol {
         return actualDirectory.addFile(file);
     }
     
+    //CambiarDIR
     public void changeDirectory(){}
     
     private int verificarTipoDato(String ruta) {
@@ -66,6 +69,7 @@ public class Arbol {
         return 1;
     }
     
+    //Revisa que la ruta virtual exista
     private int revisarRutaVirtual(String rutaVirtual) {
         String[] todosDirectorios = rutaVirtual.split("/"); 
         directorioTemp = actualDirectory;
@@ -74,6 +78,7 @@ public class Arbol {
         for(int i = 1; i < todosDirectorios.length - 1; i++) {
             directorioTemp = directorioTemp.findDirectory(todosDirectorios[i]);
             if(directorioTemp == null)
+                //Ruta virtual no es valida
                 return -1;
         }
         if(todosDirectorios.length == 1)
@@ -82,9 +87,11 @@ public class Arbol {
         String[] pasosFinales = pasoFinal.split("\\.");
         if(pasosFinales.length == 1) {
             directorioTemp = directorioTemp.findDirectory(pasoFinal);
+            //Ruta virtual apunta a un directorio
             return 1;
         }
         archivoTemp = directorioTemp.findFile(pasoFinal);
+        //Ruta virtual apunta a un archivo
         return 0;
     }
     
@@ -178,6 +185,33 @@ public class Arbol {
         return directorioCopia;
     }
     
+    //MoVer
+    public boolean move(String route, String name, String newName, boolean hasExtension){
+        boolean result = false;
+        int type = revisarRutaVirtual(route);
+        if(type == 1){
+            if(hasExtension && !directorioTemp.fileExist(newName)){
+                File file = actualDirectory.removeFile(name);
+                if(file != null){
+                    file.setFileName(newName);
+                    file.setModificationDate();
+                    directorioTemp.addFile(file);
+                    result = true;
+                }
+            }else if (!directorioTemp.directoryExist(newName)){
+                Directory dir = actualDirectory.removeDirectory(name);
+                if(dir != null){
+                    dir.setFather(directorioTemp);
+                    dir.setDirectoryName(newName);
+                    directorioTemp.addDirectory(dir);
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+    
+    //COPY
     //No usar rutas con espacios
     public boolean copy(String rutaOrigen, String rutaDestino) throws IOException{
         boolean esPrimeraRutaReal = false;
@@ -285,6 +319,7 @@ public class Arbol {
         return true;
     }
     
+    //ModFILE
     public void modFile(String fileName, String content){
         File file = actualDirectory.findFile(fileName);
         file.setContent(content);
@@ -292,6 +327,7 @@ public class Arbol {
         file.setSize(content.length());
     }
     
+    //VerPropiedades
     public String fileProperties(String fileName){
         File file = actualDirectory.findFile(fileName);
         if(file != null){
@@ -300,6 +336,7 @@ public class Arbol {
         return "File not fount";
     }
     
+    //VerFile
     public String fileContent(String fileName){
         File file = actualDirectory.findFile(fileName);
         if(file != null){
@@ -308,8 +345,28 @@ public class Arbol {
         return "File not fount";
     }
     
-    public String find(String name){
-        return "";
+    //FIND
+    public ArrayList<String> find(String name){
+        ArrayList<String> found = findAux(name, "FS/", root);
+        return found;
+    }
+    
+    private ArrayList<String> findAux(String name, String route, Directory dir){
+        ArrayList<String> match = new ArrayList<>();
+        if(dir.getDirectoryName().equals(name)){
+            match.add(route + name);
+        }
+        for(Map.Entry directoryEntry: dir.getDirectories().entrySet()){
+            Directory directory = (Directory) directoryEntry.getValue();
+            match.addAll(findAux(name,route + dir.getDirectoryName() + "/", directory));
+        }
+        for(Map.Entry fileEntry: dir.getFiles().entrySet()){
+            File file = (File) fileEntry.getValue();
+            if(file.getFileName().equals(name) || file.getExtension().equals(name) || (file.getFileName() + file.getExtension()).equals(name)){
+                match.add(route + (file.getFileName() + file.getExtension()));
+            }
+        }
+        return match;
     }
     
     public boolean renameFile(String fileName, String newName){
