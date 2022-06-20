@@ -206,9 +206,9 @@ public class Hilo extends Thread{
             case 11:
                 nombre = instruccions[1].split("\\."); 
                 if(nombre.length==2){
-                    arbolCreado.actualDirectory.removeFile(instruccions[1]);
+                    arbolCreado.actualDirectory.deleteFile(instruccions[1]);
                 }else{
-                    arbolCreado.actualDirectory.removeDirectory(instruccions[1]);
+                    arbolCreado.actualDirectory.deleteDirectory(instruccions[1]);
                 }
                 //dirActual = arbolCreado.actualDirectory.getDirectoryName() + "/>";
               break;
