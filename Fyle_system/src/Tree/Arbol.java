@@ -336,11 +336,14 @@ public class Arbol {
     //ModFILE
     public void modFile(String fileName, String content){
         File file = actualDirectory.findFile(fileName);
-        file.setContent(content);
-        file.setModificationDate();
-        file.setSize(content.length());
-        ManejadorDD.eliminarEspacios(file.getRegistrosBase());
-        file.setRegistrosBase(ManejadorDD.insertarEspacio(content));
+        if(ManejadorDD.cantidadSectoresVacios + file.getSize() >= content.length()){
+            file.setContent(content);
+            file.setModificationDate();
+            file.setSize(content.length());
+            ManejadorDD.eliminarEspacios(file.getRegistrosBase());
+            file.setRegistrosBase(ManejadorDD.insertarEspacio(content));
+        }
+        System.out.println("No hay suficiente espacio para la modificacion");
     }
     
     //VerPropiedades
