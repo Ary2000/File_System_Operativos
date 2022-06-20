@@ -73,14 +73,15 @@ public class Directory {
             }
             else{
                 temp = d.deleteAll();
-                for(Map.Entry fileEntry: files.entrySet()){
-                    File file = (File) fileEntry.getValue();
-                    temp.addAll(file.getRegistrosBase());
-                }
+                //for(Map.Entry fileEntry: d.files.entrySet()){
+                //    File file = (File) fileEntry.getValue();
+                //    temp.addAll(file.getRegistrosBase());
+                //}
                 this.directories.remove(dName);
             }
         }
         files.clear();
+        ManejadorDD.eliminarEspacios(temp);
         return temp;
     }
 
@@ -90,7 +91,7 @@ public class Directory {
             String dName = (String)directoryEntry.getKey();
             Directory directory = (Directory) directoryEntry.getValue();
             temp.addAll(directory.deleteAll());
-            directories.remove(dName);//corregir?
+            directories.remove(dName);//corregir
         }
         for(Map.Entry fileEntry: files.entrySet()){
             File file = (File) fileEntry.getValue();
@@ -108,13 +109,14 @@ public class Directory {
         return false;
     }
 
-    public ArrayList<Integer> deleteFile(String fileName){
+    public void deleteFile(String fileName){
         if(fileExist(fileName)){
             File file = files.get(fileName);
+            ManejadorDD.eliminarEspacios(file.getRegistrosBase());
             files.remove(fileName);
-            return file.getRegistrosBase();
+            //return file.getRegistrosBase();
         }
-        return null;
+        //return null;
     }
     
     public Directory removeDirectory(String dirName){
